@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies.bevy]
 version = "0.15.3"
 default-features = false
-features = ["bevy_sprite", "bevy_winit"]
+features = ["bevy_sprite", "bevy_state", "bevy_winit"]
 
 [target.x86_64-unknown-linux-gnu.dependencies.bevy]
 version = "0.15.3"
