@@ -24,6 +24,18 @@ pub enum GameResult {
     Winner(Player),
 }
 
+impl AsRef<str> for GameResult {
+    fn as_ref(&self) -> &str {
+        match self {
+            GameResult::Draw => "It's a DRAW!",
+            GameResult::Winner(player) => match player {
+                crate::Player::X => "Winner: X!",
+                crate::Player::O => "Winner: O!",
+            },
+        }
+    }
+}
+
 #[derive(Resource)]
 pub struct BoardData {
     turn_owner: Player,
@@ -81,18 +93,11 @@ impl BoardData {
 
         if match_won {
             self.result = Some(GameResult::Winner(self.turn_owner()));
-            info!("Match over. {:?} won!", self.turn_owner);
         } else if self.has_potential_win() {
             self.next_turn();
         } else {
             self.result = Some(GameResult::Draw);
-            info!("Match over. It's a DRAW");
         }
-    }
-
-    /// Converts (x, y) coordinates to a bit index.
-    pub fn coord_to_bit(x: i32, y: i32) -> u16 {
-        1 << (x + y * 3)
     }
 
     /// Check if there's any line still potentially open for a win.
@@ -106,8 +111,7 @@ impl BoardData {
         false
     }
 
-    pub fn cell_is_free(&self, x: i32, y: i32) -> bool {
-        let cell_mask = Self::coord_to_bit(x, y);
+    pub fn cell_is_free(&self, cell_mask: u16) -> bool {
         (self.x_mask & cell_mask == 0) && (self.o_mask & cell_mask == 0)
     }
 }

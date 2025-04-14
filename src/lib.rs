@@ -1,5 +1,7 @@
 mod board_data;
-mod tile;
+mod cell;
+mod colors;
+mod ui;
 
 use std::collections::HashMap;
 
@@ -7,9 +9,10 @@ use bevy::ecs::system::SystemId;
 use bevy::prelude::*;
 
 use board_data::BoardData;
-use tile::{MarkTileEvent, Tile};
+use cell::{Cell, CellMarkEvent, Grid, grid_cell_interaction, mark_cell};
+use ui::{FontAsset, FontSpaceGrotesk};
 
-const TILE_SIZE: f32 = 60.;
+const CELL_SIZE: f32 = 60.;
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 enum Player {
@@ -18,9 +21,11 @@ enum Player {
 }
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
-enum Game {
+enum GameState {
     #[default]
-    Setup,
+    Initialization,
+    Idle,
+    Start,
     InProgress,
     Over,
 }
@@ -30,20 +35,48 @@ pub struct TicTacToe;
 impl Plugin for TicTacToe {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.init_resource::<BoardSystems>();
-        app.add_event::<MarkTileEvent>();
-        app.init_state::<Game>();
+        app.add_event::<CellMarkEvent>();
+        app.init_state::<GameState>();
 
-        app.add_systems(OnEnter(Game::Setup), startup);
-        app.add_systems(PostUpdate, register_mark.run_if(in_state(Game::InProgress)));
+        app.add_systems(
+            OnEnter(GameState::Initialization),
+            (load_assets, spawn_camera).chain(),
+        );
+
+        app.add_systems(OnEnter(GameState::Idle), ui::home_screen);
+        app.add_systems(
+            Update,
+            ui::home_screen_interaction.run_if(in_state(GameState::Idle)),
+        );
+        app.add_systems(OnExit(GameState::Idle), ui::home_screen_cleanup);
+
+        app.add_systems(OnEnter(GameState::Start), initialize_board);
+
+        app.add_systems(
+            Update,
+            grid_cell_interaction.run_if(in_state(GameState::InProgress)),
+        );
+        app.add_systems(
+            PostUpdate,
+            mark_cell.run_if(in_state(GameState::InProgress)),
+        );
+
+        app.add_systems(OnEnter(GameState::Over), ui::game_over_screen);
+        app.add_systems(
+            Update,
+            ui::game_over_screen_interaction.run_if(in_state(GameState::Over)),
+        );
+        app.add_systems(OnExit(GameState::Over), ui::game_over_screen_cleanup);
     }
 }
 
-fn startup(mut cmds: Commands, board_systems: Res<BoardSystems>) {
-    cmds.run_system(board_systems["clear_board"]);
+fn load_assets(mut cmds: Commands, asset_server: Res<AssetServer>) {
+    let font_handle = asset_server.load::<Font>(FontAsset::SpaceGrotesk.as_ref());
+    cmds.insert_resource(FontSpaceGrotesk(font_handle));
 }
 
-fn initialize_board(mut cmd: Commands, mut game_state: ResMut<NextState<Game>>) {
-    cmd.spawn((
+fn spawn_camera(mut cmds: Commands, mut game_state: ResMut<NextState<GameState>>) {
+    cmds.spawn((
         Camera2d,
         Transform {
             translation: Vec3 {
@@ -51,48 +84,62 @@ fn initialize_board(mut cmd: Commands, mut game_state: ResMut<NextState<Game>>) 
                 y: 120.,
                 z: 1.,
             },
-            ..Default::default()
+            ..default()
         },
     ));
-    for x in 0..=2 {
-        for y in 0..=2 {
-            Tile::spawn(
-                &mut cmd,
-                Vec2 {
-                    x: (TILE_SIZE * x as f32) + TILE_SIZE / 2.,
-                    y: (TILE_SIZE * y as f32) + TILE_SIZE / 2.,
-                },
-            );
-        }
-    }
 
-    game_state.set(Game::InProgress);
+    game_state.set(GameState::Idle);
 }
 
-fn register_mark(
-    mut board: ResMut<BoardData>,
-    mut ev_marked: EventReader<MarkTileEvent>,
-    mut game_state: ResMut<NextState<Game>>,
-) {
-    if let Some(MarkTileEvent(cell_mask)) = ev_marked.read().next() {
-        board.mark_cell(*cell_mask);
-        if board.result().is_some() {
-            game_state.set(Game::Over);
-        }
-    }
-}
-
-fn clear_board(
-    mut cmds: Commands,
-    tiles: Query<Entity, With<Tile>>,
-    board_systems: Res<BoardSystems>,
-) {
-    for tile in &tiles {
-        cmds.entity(tile).despawn();
-    }
-
+fn initialize_board(mut cmds: Commands, mut game_state: ResMut<NextState<GameState>>) {
     cmds.insert_resource(BoardData::new());
-    cmds.run_system(board_systems["initialize_board"]);
+    cmds.spawn((
+        Grid,
+        Node {
+            width: Val::Px(CELL_SIZE * 3.),
+            height: Val::Px(CELL_SIZE * 3.),
+            top: Val::Px(244. - CELL_SIZE * 3.),
+            left: Val::Px(4.),
+            align_items: AlignItems::Center,
+            justify_items: JustifyItems::Center,
+            row_gap: Val::Px(1.),
+            column_gap: Val::Px(1.),
+            display: Display::Grid,
+            grid_template_rows: vec![RepeatedGridTrack::px(3, CELL_SIZE)],
+            grid_template_columns: vec![RepeatedGridTrack::px(3, CELL_SIZE)],
+            ..default()
+        },
+        ZIndex(0),
+    ))
+    .with_children(|grid| {
+        for idx in 1u16..=9 {
+            grid.spawn((
+                Cell(1 << (idx - 1)), // Stores each cell on a different bit
+                Button,
+                Node {
+                    width: Val::Px(CELL_SIZE),
+                    height: Val::Px(CELL_SIZE),
+                    border: UiRect::all(Val::Px(2.)),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    ..default()
+                },
+                BorderColor(colors::GREEN_YELLOW.into()),
+                BackgroundColor(colors::DODGER_BLUE.into()),
+                BorderRadius::all(Val::Px(5.)),
+            ));
+        }
+    });
+
+    game_state.set(GameState::InProgress);
+}
+
+fn clear_board(mut cmds: Commands, grid: Query<Entity, With<Grid>>) {
+    if let Ok(grid) = grid.get_single() {
+        cmds.entity(grid).despawn_recursive();
+    }
+
+    cmds.remove_resource::<BoardData>();
 }
 
 #[derive(Resource, Deref, DerefMut)]
@@ -101,13 +148,7 @@ struct BoardSystems(HashMap<String, SystemId>);
 impl FromWorld for BoardSystems {
     fn from_world(world: &mut World) -> Self {
         let mut map = HashMap::new();
-
-        map.insert(
-            "initialize_board".into(),
-            world.register_system(initialize_board),
-        );
         map.insert("clear_board".into(), world.register_system(clear_board));
-
         Self(map)
     }
 }
