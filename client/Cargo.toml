@@ -3,25 +3,28 @@ name = "tic-tac-toe"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
+# Release builds with `cargo b --release --no-default-features -F bevy_static`
+[features]
+default = ["bevy_dynamic"]
+bevy_dynamic = ["bevy/dynamic_linking"]
+bevy_static = []
 
-[dependencies.bevy]
-version = "0.15.3"
-default-features = false
-features = ["bevy_sprite", "bevy_state", "bevy_winit", "bevy_ui"]
+[dependencies]
+bevy = { version = "0.15.3", default-features = false, features = [
+    "bevy_sprite", "bevy_state", "bevy_winit", "bevy_ui"
+] }
+crossbeam-channel = "0.5.15"
+paste = "1.0.15"
+spacetimedb-sdk = "1.1.0"
 
 [target.x86_64-unknown-linux-gnu.dependencies.bevy]
 version = "0.15.3"
 default-features = false
-features = ["dynamic_linking", "wayland"]
+features = ["wayland"]
 
-[target.wasm32-unknown-unknown.dependencies.bevy]
+[target.x86_64-pc-windows-gnu.dependencies.bevy]
 version = "0.15.3"
 default-features = false
-features = ["webgl2"]
-
-[target.wasm32-unknown-unknown.dependencies.bevy_ecs]
-version = "0.15.3"
 
 [profile.dev]
 opt-level = 1
