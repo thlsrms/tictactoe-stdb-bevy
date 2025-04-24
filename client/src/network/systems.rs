@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+#[cfg(target_arch = "wasm32")]
+use bevy::tasks::futures_lite;
 use spacetimedb_sdk::DbContext as _;
 
 use crate::AppState;
@@ -34,6 +36,14 @@ pub fn setup_systems(app: &mut App) {
     )
         .run_if(in_state(AppState::GameInProgress));
 
+    #[cfg(target_arch = "wasm32")]
+    app.add_systems(
+        PreUpdate,
+        check_connection_ready.run_if(in_state(AppState::Initialization)),
+    );
+    #[cfg(target_arch = "wasm32")]
+    app.add_systems(FixedUpdate, network_tick_connection);
+
     app.add_systems(
         Update,
         (
@@ -45,12 +55,46 @@ pub fn setup_systems(app: &mut App) {
     );
 }
 
+#[cfg(target_arch = "wasm32")]
+pub fn network_tick_connection(maybe_connection: Option<Res<NetworkConnection>>) {
+    let Some(connection) = maybe_connection else {
+        return;
+    };
+    match connection.frame_tick() {
+        Ok(_) => {} //info!("Network is ticking"),
+        Err(_err) => error!("Connection dropped?"),
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn check_connection_ready(
+    mut cmds: Commands,
+    maybe_pending: Option<ResMut<super::PendingConnection>>,
+) {
+    let Some(mut pending) = maybe_pending else {
+        return;
+    };
+
+    if let Some(mut conn) =
+        futures_lite::future::block_on(futures_lite::future::poll_once(&mut pending.0))
+    {
+        super::register_callbacks(&mut cmds, &mut conn);
+        conn.frame_tick().unwrap();
+
+        cmds.insert_resource(NetworkConnection::new(conn));
+        cmds.remove_resource::<super::PendingConnection>();
+    }
+}
+
 pub fn on_network_connected(
     mut cmds: Commands,
     mut on_connected_ev: EventReader<NetworkEvent<OnConnect>>,
-    connection: ResMut<NetworkConnection>,
+    maybe_connection: Option<Res<NetworkConnection>>,
     mut game_state: ResMut<NextState<AppState>>,
 ) {
+    let Some(connection) = maybe_connection else {
+        return;
+    };
     for NetworkEvent(OnConnect(NetworkAuth {
         identity,
         authorization,
@@ -59,18 +103,48 @@ pub fn on_network_connected(
         info!("Connection established");
         info!("Identity '{identity}'");
 
-        let _game_sub_handle = connection.subscription_builder().subscribe(format!(
+        #[cfg(target_arch = "wasm32")]
+        gloo_console::log!("Connection established");
+        #[cfg(target_arch = "wasm32")]
+        gloo_console::log!("Identity '", format!("{identity}'"));
+
+        let _ = connection.subscription_builder().subscribe(format!(
             "SELECT * FROM game WHERE x_player = '{}' OR o_player = '{}'",
             identity, identity
         ));
 
+        #[cfg(target_arch = "wasm32")]
+        {
+            // On the web we can't connect using `with_token`, so we would have
+            // to send our authorization token through a reducer if needed.
+            let authorization: String = {
+                let creds = spacetimedb_sdk::credentials::StorageEntry::new("tic-tac-toe_token");
+                if creds.load().as_ref().is_ok_and(|t| t.is_none()) {
+                    _ = creds.save(authorization.clone());
+                    authorization.to_owned()
+                } else if let Ok(Some(token)) = creds.load() {
+                    token
+                } else {
+                    _ = creds.save(authorization.clone());
+                    authorization.to_owned()
+                }
+            };
+
+            cmds.insert_resource(NetworkAuth {
+                identity: *identity,
+                authorization: authorization.to_owned(),
+            });
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
         cmds.insert_resource(NetworkAuth {
             identity: *identity,
             authorization: authorization.to_owned(),
         });
+
+        // Connection established, we can load the home_screen
+        game_state.set(AppState::HomeScreen);
     }
-    // Connection established, we can load the home_screen
-    game_state.set(AppState::HomeScreen);
 }
 
 pub fn on_lobby_room_created(

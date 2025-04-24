@@ -691,6 +691,7 @@ dependencies = [
  "bevy_input",
  "bevy_log",
  "bevy_math",
+ "bevy_pbr",
  "bevy_picking",
  "bevy_ptr",
  "bevy_reflect",
@@ -782,6 +783,35 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "226f663401069ded4352ed1472a85bb1f43e2b7305d6a50e53a4f6508168e380"
 dependencies = [
  "glam",
+]
+
+[[package]]
+name = "bevy_pbr"
+version = "0.15.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4d54c840d4352dac51f2a27cf915ac99b2f93db008d8fb1be8d23b09d522acf"
+dependencies = [
+ "bevy_app",
+ "bevy_asset",
+ "bevy_color",
+ "bevy_core_pipeline",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_image",
+ "bevy_math",
+ "bevy_reflect",
+ "bevy_render",
+ "bevy_transform",
+ "bevy_utils",
+ "bevy_window",
+ "bitflags 2.9.0",
+ "bytemuck",
+ "derive_more 1.0.0",
+ "fixedbitset 0.5.7",
+ "nonmax",
+ "radsort",
+ "smallvec",
+ "static_assertions",
 ]
 
 [[package]]
@@ -2191,9 +2221,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73fea8450eea4bac3940448fb7ae50d91f034f941199fcd9d909a5a07aa455f0"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "r-efi",
  "wasi 0.14.2+wasi-0.2.4",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2229,6 +2261,32 @@ name = "glob"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
+
+[[package]]
+name = "gloo-console"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a17868f56b4a24f677b17c8cb69958385102fa879418052d60b50bc1727e261"
+dependencies = [
+ "gloo-utils",
+ "js-sys",
+ "serde",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "gloo-utils"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b5555354113b18c547c1d3a98fbf7fb32a9ff4f6fa112ce823a21641a0ba3aa"
+dependencies = [
+ "js-sys",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "web-sys",
+]
 
 [[package]]
 name = "glow"
@@ -3644,6 +3702,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 
 [[package]]
+name = "ring"
+version = "0.17.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7"
+dependencies = [
+ "cc",
+ "cfg-if",
+ "getrandom 0.2.15",
+ "libc",
+ "untrusted",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
 name = "ron"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3706,6 +3778,39 @@ dependencies = [
  "libc",
  "linux-raw-sys 0.9.4",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "rustls"
+version = "0.23.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df51b5869f3a441595eac5e8ff14d486ff285f7b8c0df8770e49c3b56351f0f0"
+dependencies = [
+ "once_cell",
+ "rustls-pki-types",
+ "rustls-webpki",
+ "subtle",
+ "zeroize",
+]
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "917ce264624a4b4db1c364dcc35bfca9ded014d0a958cd47ad3e960e988ea51c"
+dependencies = [
+ "web-time",
+]
+
+[[package]]
+name = "rustls-webpki"
+version = "0.103.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fef8b8769aaccf73098557a87cd1816b4f9c7c16811c9c77142aa695c16f2c03"
+dependencies = [
+ "ring",
+ "rustls-pki-types",
+ "untrusted",
 ]
 
 [[package]]
@@ -4014,9 +4119,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-bindings-macro"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d03a1fd20efaef18e120c2f58e3627792ac940cf4ba2c7ab257c14f93af4630"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "heck 0.4.1",
  "humantime",
@@ -4028,9 +4132,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-client-api-messages"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b70f5d4430821f4d707e1a0773b9314ad7069d6a92da672bd731b7f127625b2e"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "brotli",
  "bytes",
@@ -4052,9 +4155,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-data-structures"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6dfabc712bba5caed8e9c640aef5b15593632803a184a4f4c189e29203606051"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "ahash",
  "hashbrown 0.15.2",
@@ -4065,9 +4167,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-lib"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8512ccf4e88eb5e7a3e372698b1906f8c0b00048a42f65d08f3835f5d905b50"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "anyhow",
  "bitflags 2.9.0",
@@ -4088,9 +4189,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-metrics"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17979ec82982aedabb283e6c0ddb424a868de57b264c70eb16e35b9c4a51a0b7"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "arrayvec",
  "itertools 0.12.1",
@@ -4100,9 +4200,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-primitives"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "618e216164cc4d31ae097404bcd941ccd18f0e6032770b8eb7fd3ba062129513"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "bitflags 2.9.0",
  "either",
@@ -4112,9 +4211,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-sats"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "097b2267e8efe5a0bda872468e81e726d28d8e1595b48708da0d64966c7972de"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "anyhow",
  "arrayvec",
@@ -4141,9 +4239,8 @@ dependencies = [
 
 [[package]]
 name = "spacetimedb-sdk"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18a89335af964d48f98a9472bcfef4134476995bfac155f6a2d01053494606a6"
+version = "1.1.1"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
 dependencies = [
  "anymap",
  "base64 0.21.7",
@@ -4151,12 +4248,16 @@ dependencies = [
  "bytes",
  "futures",
  "futures-channel",
+ "futures-util",
+ "getrandom 0.3.2",
+ "gloo-console",
  "home",
  "http",
  "log",
  "once_cell",
  "prometheus",
  "rand 0.9.1",
+ "rustls-pki-types",
  "spacetimedb-client-api-messages",
  "spacetimedb-data-structures",
  "spacetimedb-lib",
@@ -4165,6 +4266,11 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "tokio-tungstenite",
+ "tokio-tungstenite-wasm",
+ "tungstenite",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]
@@ -4221,6 +4327,12 @@ dependencies = [
  "rustversion",
  "syn",
 ]
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 
 [[package]]
 name = "svg_fmt"
@@ -4349,7 +4461,9 @@ name = "tic-tac-toe"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_ecs",
  "crossbeam-channel",
+ "gloo-console",
  "paste",
  "spacetimedb-sdk",
 ]
@@ -4488,6 +4602,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-tungstenite-wasm"
+version = "0.5.0"
+source = "git+https://github.com/thlsrms/tokio-tungstenite-wasm?rev=c788b7cfc30f576c#c788b7cfc30f576c207344c2907932b5317ca5e0"
+dependencies = [
+ "bytes",
+ "futures-channel",
+ "futures-util",
+ "http",
+ "httparse",
+ "js-sys",
+ "thiserror 2.0.12",
+ "tokio",
+ "tokio-tungstenite",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "toml_datetime"
 version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4622,6 +4754,7 @@ dependencies = [
  "log",
  "native-tls",
  "rand 0.9.1",
+ "rustls",
  "sha1",
  "thiserror 2.0.12",
  "utf-8",
@@ -4698,6 +4831,12 @@ name = "unicode-xid"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
+
+[[package]]
+name = "untrusted"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "utf-8"
@@ -5460,3 +5599,9 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "zeroize"
+version = "1.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
