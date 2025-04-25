@@ -39,10 +39,8 @@ pub fn setup_systems(app: &mut App) {
     #[cfg(target_arch = "wasm32")]
     app.add_systems(
         PreUpdate,
-        check_connection_ready.run_if(in_state(AppState::Initialization)),
+        poll_pending_connection.run_if(in_state(AppState::Initialization)),
     );
-    #[cfg(target_arch = "wasm32")]
-    app.add_systems(FixedUpdate, network_tick_connection);
 
     app.add_systems(
         Update,
@@ -56,18 +54,7 @@ pub fn setup_systems(app: &mut App) {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn network_tick_connection(maybe_connection: Option<Res<NetworkConnection>>) {
-    let Some(connection) = maybe_connection else {
-        return;
-    };
-    match connection.frame_tick() {
-        Ok(_) => {} //info!("Network is ticking"),
-        Err(_err) => error!("Connection dropped?"),
-    }
-}
-
-#[cfg(target_arch = "wasm32")]
-fn check_connection_ready(
+fn poll_pending_connection(
     mut cmds: Commands,
     maybe_pending: Option<ResMut<super::PendingConnection>>,
 ) {
@@ -79,8 +66,7 @@ fn check_connection_ready(
         futures_lite::future::block_on(futures_lite::future::poll_once(&mut pending.0))
     {
         super::register_callbacks(&mut cmds, &mut conn);
-        conn.frame_tick().unwrap();
-
+        conn.run_threaded();
         cmds.insert_resource(NetworkConnection::new(conn));
         cmds.remove_resource::<super::PendingConnection>();
     }

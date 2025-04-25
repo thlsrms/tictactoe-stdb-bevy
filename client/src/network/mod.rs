@@ -9,7 +9,7 @@ use std::sync::Mutex;
 
 use bevy::prelude::*;
 #[cfg(target_arch = "wasm32")]
-use bevy::tasks::{AsyncComputeTaskPool, Task};
+use bevy::tasks::AsyncComputeTaskPool;
 use spacetimedb_sdk::{DbContext, Table, TableWithPrimaryKey};
 
 use bindings::*;
@@ -22,30 +22,59 @@ pub use bindings::{
 pub use resources::*;
 pub use systems::*;
 
-#[cfg(not(target_arch = "wasm32"))]
 pub fn connect_stdb(app: &mut App) {
     let conn_builder = DbConnection::builder()
         .with_module_name(env!("STDB_MOD_NAME"))
-        .with_uri(format!("https://{}", env!("STDB_HOSTNAME")))
+        .with_uri(format!("https://{}", env!("STDB_HOST")))
         .with_light_mode(true);
 
-    let mut conn = stdb_lifecycle!(app, conn_builder, (OnConnect, OnConnectError, OnDisconnect))
-        .build()
-        .expect("Failed to establish connection.");
+    let conn_builder =
+        stdb_lifecycle!(app, conn_builder, (OnConnect, OnConnectError, OnDisconnect));
 
-    // run_threaded:    Spawn a thread to process messages in the background.
-    // run_async:       Process messages in an async task.
-    // frame_tick:      Process messages on the main thread without blocking.
-    conn.run_threaded();
-    register_callbacks(app, &mut conn);
-    app.insert_resource(NetworkConnection::new(conn));
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let mut conn = conn_builder
+            .build()
+            .expect("Failed to establish connection.");
+        conn.run_threaded();
+        register_callbacks(app, &mut conn);
+        app.insert_resource(NetworkConnection::new(conn));
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        // The web version needs to poll the connection
+        let connection_task = AsyncComputeTaskPool::get().spawn(async move {
+            conn_builder
+                .build()
+                .await
+                .expect("Failed to establish connection.")
+        });
+        app.insert_resource(PendingConnection(connection_task));
+
+        // Declare all events to be used.
+        // We will subscribe to their callbacks after the connection is polled.
+        stdb_register_event!(
+            app,
+            OnSubscriptionApplied<Vec<LobbyRoom>>,
+            OnInsert<LobbyRoom>,
+            OnDelete<LobbyRoom>,
+            OnInsert<Game>,
+            OnDelete<Game>,
+            OnUpdate<Game>
+        );
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn register_callbacks(app: &mut App, conn: &mut DbConnection) {
+use bevy::prelude::App as Context;
+#[cfg(target_arch = "wasm32")]
+use bevy::prelude::Commands as Context;
+
+fn register_callbacks(ctx: &mut Context, conn: &mut DbConnection) {
     // Subscription
     stdb_subscribe!(
-        app,
+        ctx,
         conn,
         "SELECT * FROM lobby_room",            // Query
         OnSubscriptionApplied<Vec<LobbyRoom>>, // Return type / Type to be wrapped by NetworkEvent
@@ -55,11 +84,11 @@ fn register_callbacks(app: &mut App, conn: &mut DbConnection) {
         }
     );
     // Insert/Delete/Update
-    stdb_subscribe!(app, conn, OnInsert<LobbyRoom>);
-    stdb_subscribe!(app, conn, OnDelete<LobbyRoom>);
-    stdb_subscribe!(app, conn, OnInsert<Game>);
-    stdb_subscribe!(app, conn, OnDelete<Game>);
-    stdb_subscribe!(app, conn, OnUpdate, Game);
+    stdb_subscribe!(ctx, conn, OnInsert<LobbyRoom>);
+    stdb_subscribe!(ctx, conn, OnDelete<LobbyRoom>);
+    stdb_subscribe!(ctx, conn, OnInsert<Game>);
+    stdb_subscribe!(ctx, conn, OnDelete<Game>);
+    stdb_subscribe!(ctx, conn, OnUpdate, Game);
 
     // Example of subscription with error
     // stdb_event!(
@@ -74,62 +103,6 @@ fn register_callbacks(app: &mut App, conn: &mut DbConnection) {
     //     OnSubscriptionError,
     //     |_: &ErrorContext, err| { OnSubscriptionError(err) }
     // );
-}
-
-#[cfg(target_arch = "wasm32")]
-#[derive(Resource)]
-struct PendingConnection(pub Task<DbConnection>);
-
-#[cfg(target_arch = "wasm32")]
-pub fn connect_stdb(app: &mut App) {
-    let conn_builder = DbConnection::builder()
-        .with_module_name(env!("STDB_MOD_NAME"))
-        .with_uri(format!("https://{}", env!("STDB_HOSTNAME")))
-        .with_light_mode(true);
-
-    let builder = stdb_lifecycle!(app, conn_builder, (OnConnect, OnConnectError, OnDisconnect));
-
-    // Declare all events to be used.
-    // We will subscribe to their callbacks after the connection is polled.
-    stdb_register_event!(
-        app,
-        OnSubscriptionApplied<Vec<LobbyRoom>>,
-        OnInsert<LobbyRoom>,
-        OnDelete<LobbyRoom>,
-        OnInsert<Game>,
-        OnDelete<Game>,
-        OnUpdate<Game>
-    );
-
-    let connection_task = AsyncComputeTaskPool::get().spawn(async move {
-        builder
-            .build()
-            .await
-            .expect("Failed to establish connection.")
-    });
-
-    app.insert_resource(PendingConnection(connection_task));
-}
-
-#[cfg(target_arch = "wasm32")]
-fn register_callbacks(cmds: &mut Commands, conn: &mut DbConnection) {
-    // Subscription
-    stdb_subscribe!(
-        cmds,
-        conn,
-        "SELECT * FROM lobby_room",            // Query
-        OnSubscriptionApplied<Vec<LobbyRoom>>, // Return type / Type to be wrapped by NetworkEvent
-        |ctx: &SubscriptionEventContext| {
-            let lobby_rooms = ctx.db.lobby_room().iter().collect::<Vec<LobbyRoom>>();
-            OnSubscriptionApplied(lobby_rooms)
-        }
-    );
-    // Insert/Delete/Update
-    stdb_subscribe!(cmds, conn, OnInsert<LobbyRoom>);
-    stdb_subscribe!(cmds, conn, OnDelete<LobbyRoom>);
-    stdb_subscribe!(cmds, conn, OnInsert<Game>);
-    stdb_subscribe!(cmds, conn, OnDelete<Game>);
-    stdb_subscribe!(cmds, conn, OnUpdate, Game);
 }
 
 /// Listens on the EventQueue and writes Bevy events

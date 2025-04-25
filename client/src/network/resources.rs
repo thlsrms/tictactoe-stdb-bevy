@@ -12,6 +12,10 @@ pub struct NetworkAuth {
     pub authorization: String,
 }
 
+#[cfg(target_arch = "wasm32")]
+#[derive(Resource)]
+pub struct PendingConnection(pub bevy::tasks::Task<DbConnection>);
+
 #[derive(Resource, Deref, DerefMut)]
 pub struct NetworkConnection(pub DbConnection);
 

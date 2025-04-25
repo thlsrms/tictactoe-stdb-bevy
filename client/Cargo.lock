@@ -4120,7 +4120,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-bindings-macro"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "heck 0.4.1",
  "humantime",
@@ -4133,7 +4133,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-client-api-messages"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "brotli",
  "bytes",
@@ -4156,7 +4156,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-data-structures"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "ahash",
  "hashbrown 0.15.2",
@@ -4168,7 +4168,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-lib"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "anyhow",
  "bitflags 2.9.0",
@@ -4190,7 +4190,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-metrics"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "arrayvec",
  "itertools 0.12.1",
@@ -4201,7 +4201,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-primitives"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "bitflags 2.9.0",
  "either",
@@ -4212,7 +4212,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sats"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "anyhow",
  "arrayvec",
@@ -4240,7 +4240,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sdk"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?rev=ce8c5bb1fef8d2ce36d08f18e#ce8c5bb1fef8d2ce36d08f18eefd8f049accdb06"
+source = "git+https://github.com/thlsrms/SpacetimeDB?rev=426a2d9d95920202605d9a2fe#426a2d9d95920202605d9a2fe8c5a1b6d693f197"
 dependencies = [
  "anymap",
  "base64 0.21.7",
