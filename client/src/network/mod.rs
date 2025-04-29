@@ -25,19 +25,19 @@ pub use systems::*;
 pub fn connect_stdb(app: &mut App) {
     let conn_builder = DbConnection::builder()
         .with_module_name(env!("STDB_MOD_NAME"))
-        .with_uri(format!("https://{}", env!("STDB_HOST")))
+        .with_uri(env!("STDB_HOST"))
         .with_light_mode(true);
 
-    let conn_builder =
-        stdb_lifecycle!(app, conn_builder, (OnConnect, OnConnectError, OnDisconnect));
+    // Register the events for the lifecycle callbacks: OnConnect, OnConnectError, OnDisconnect
+    let conn_builder = stdb_lifecycle_events!(app, conn_builder);
 
     #[cfg(not(target_arch = "wasm32"))]
     {
         let mut conn = conn_builder
             .build()
             .expect("Failed to establish connection.");
-        conn.run_threaded();
         register_callbacks(app, &mut conn);
+        conn.run_threaded();
         app.insert_resource(NetworkConnection::new(conn));
     }
 
@@ -53,10 +53,11 @@ pub fn connect_stdb(app: &mut App) {
         app.insert_resource(PendingConnection(connection_task));
 
         // Declare all events to be used.
-        // We will subscribe to their callbacks after the connection is polled.
+        // We need to subscribe to their callbacks after the connection is polled.
+        // OnEvent<Table>
         stdb_register_event!(
             app,
-            OnSubscriptionApplied<Vec<LobbyRoom>>,
+            OnSubApplied<Vec<LobbyRoom>>,
             OnInsert<LobbyRoom>,
             OnDelete<LobbyRoom>,
             OnInsert<Game>,
@@ -76,44 +77,29 @@ fn register_callbacks(ctx: &mut Context, conn: &mut DbConnection) {
     stdb_subscribe!(
         ctx,
         conn,
-        "SELECT * FROM lobby_room",            // Query
-        OnSubscriptionApplied<Vec<LobbyRoom>>, // Return type / Type to be wrapped by NetworkEvent
-        |ctx: &SubscriptionEventContext| {
-            let lobby_rooms = ctx.db.lobby_room().iter().collect::<Vec<LobbyRoom>>();
-            OnSubscriptionApplied(lobby_rooms)
-        }
+        "SELECT * FROM lobby_room", // Query
+        Vec<LobbyRoom>,             // Return type / Type to be wrapped by Stdb<OnSubApplied<T>>
+        |ctx| { ctx.db.lobby_room().iter().collect::<Vec<LobbyRoom>>() },
+        // Should subscribe to `on_error`? Stdb(OnSubError<T>(error))
+        false // can be omitted for false
     );
-    // Insert/Delete/Update
-    stdb_subscribe!(ctx, conn, OnInsert<LobbyRoom>);
-    stdb_subscribe!(ctx, conn, OnDelete<LobbyRoom>);
-    stdb_subscribe!(ctx, conn, OnInsert<Game>);
-    stdb_subscribe!(ctx, conn, OnDelete<Game>);
-    stdb_subscribe!(ctx, conn, OnUpdate, Game);
-
-    // Example of subscription with error
-    // stdb_event!(
-    //     app,
-    //     conn,
-    //     "SELECT * FROM lobby_room",
-    //     OnSubscriptionApplied<Vec<LobbyRoom>>,
-    //     |ctx: &SubscriptionEventContext| {
-    //         let lobby_rooms = ctx.db.lobby_room().iter().collect::<Vec<LobbyRoom>>();
-    //         OnSubscriptionApplied(lobby_rooms)
-    //     },
-    //     OnSubscriptionError,
-    //     |_: &ErrorContext, err| { OnSubscriptionError(err) }
-    // );
+    // Insert/Delete/Update -> Are wrapped by: Stdb<OnInsert | OnDelete | OnUpdate <Table>>
+    stdb_subscribe!(ctx, conn, insert, LobbyRoom);
+    stdb_subscribe!(ctx, conn, delete, LobbyRoom);
+    stdb_subscribe!(ctx, conn, insert, Game);
+    stdb_subscribe!(ctx, conn, delete, Game);
+    stdb_subscribe!(ctx, conn, update, Game);
 }
 
 /// Listens on the EventQueue and writes Bevy events
 fn process_network_queue<T: 'static + Send + Sync>(
     maybe_queue: Option<Res<EventQueue<T>>>,
-    mut writer: EventWriter<NetworkEvent<T>>,
+    mut writer: EventWriter<Stdb<T>>,
 ) {
     if let Some(q) = maybe_queue {
         let queue = q.lock().unwrap();
         if !queue.is_empty() {
-            writer.send_batch(queue.try_iter().map(|e| NetworkEvent(e)));
+            writer.write_batch(queue.try_iter().map(|e| Stdb(e)));
         }
     }
 }

@@ -91,13 +91,13 @@ pub fn home_screen(mut cmds: Commands, font: Res<FontSpaceGrotesk>) {
                 grid_row: GridPlacement::span(2),
                 ..default()
             },
-            BoxShadow {
-                color: colors::DODGER_BLUE.with_alpha(0.5).into(),
-                x_offset: Val::Px(0.),
-                y_offset: Val::Px(-2.),
-                spread_radius: Val::Px(2.),
-                blur_radius: Val::Px(20.0),
-            },
+            BoxShadow::new(
+                colors::DODGER_BLUE.with_alpha(0.5).into(),
+                Val::Px(0.),
+                Val::Px(-2.),
+                Val::Px(2.),
+                Val::Px(20.0),
+            ),
         ));
 
         let ui_button_style = UiButtonStyle {
@@ -126,13 +126,13 @@ pub fn home_screen(mut cmds: Commands, font: Res<FontSpaceGrotesk>) {
                 BorderRadius::all(Val::Px(5.0)),
                 BorderColor(ui_button_style.border_color),
                 BackgroundColor(ui_button_style.color),
-                BoxShadow {
-                    color: colors::DODGER_BLUE.with_alpha(0.5).into(),
-                    x_offset: Val::Px(0.),
-                    y_offset: Val::Px(-2.),
-                    spread_radius: Val::Percent(10.),
-                    blur_radius: Val::Px(5.0),
-                },
+                BoxShadow::new(
+                    colors::DODGER_BLUE.with_alpha(0.5).into(),
+                    Val::Px(0.),
+                    Val::Px(-2.),
+                    Val::Percent(10.),
+                    Val::Px(5.0),
+                ),
             ))
             .with_child((
                 Text::new("Create"),
@@ -260,7 +260,7 @@ pub fn update_lobby_scroll_position(
             MouseScrollUnit::Line => mouse_wheel_event.y * 15.,
             MouseScrollUnit::Pixel => mouse_wheel_event.y * 15.,
         };
-        if let Ok(mut scroll_position) = scrolled_node_query.get_single_mut() {
+        if let Ok(mut scroll_position) = scrolled_node_query.single_mut() {
             scroll_position.offset_y -= dy;
         }
     }
@@ -282,13 +282,13 @@ pub fn initialize_grid_board(
             justify_content: JustifyContent::SpaceEvenly,
             ..default()
         },
-        BoxShadow {
-            color: colors::DODGER_BLUE.with_alpha(0.5).into(),
-            x_offset: Val::Px(0.),
-            y_offset: Val::Px(-2.),
-            spread_radius: Val::Px(2.),
-            blur_radius: Val::Px(10.0),
-        },
+        BoxShadow::new(
+            colors::DODGER_BLUE.with_alpha(0.5).into(),
+            Val::Px(0.),
+            Val::Px(-2.),
+            Val::Px(2.),
+            Val::Px(10.0),
+        ),
     ))
     .with_children(|top_bar| {
         top_bar
@@ -397,13 +397,13 @@ pub fn initialize_grid_board(
             ..default()
         },
         ZIndex(0),
-        BoxShadow {
-            color: colors::GREEN_YELLOW.with_alpha(0.5).into(),
-            x_offset: Val::Px(0.),
-            y_offset: Val::Px(-2.),
-            spread_radius: Val::Px(2.),
-            blur_radius: Val::Px(10.0),
-        },
+        BoxShadow::new(
+            colors::GREEN_YELLOW.with_alpha(0.5).into(),
+            Val::Px(0.),
+            Val::Px(-2.),
+            Val::Px(2.),
+            Val::Px(10.0),
+        ),
     ))
     .with_children(|grid| {
         for idx in 1u16..=9 {
@@ -432,11 +432,12 @@ pub fn turn_expiration_time_update(
     mut turn_time_label_q: Query<&mut Text, With<TurnTimeCounter>>,
     mut game_board: ResMut<BoardData>,
     time: Res<Time>,
-) {
-    let mut turn_time_label = turn_time_label_q.single_mut();
+) -> Result {
+    let mut turn_time_label = turn_time_label_q.single_mut()?;
 
     game_board.turn_duration -= time.delta_secs();
     *turn_time_label = format!("{:.2}s", game_board.turn_duration).into();
+    Ok(())
 }
 
 #[allow(clippy::type_complexity)]
@@ -473,8 +474,8 @@ pub fn grid_cell_interaction(
 }
 
 pub fn clear_board(mut cmds: Commands, grid_q: Query<Entity, With<Grid>>) {
-    if let Ok(grid) = grid_q.get_single() {
-        cmds.entity(grid).despawn_recursive();
+    if let Ok(grid) = grid_q.single() {
+        cmds.entity(grid).despawn();
     }
 
     cmds.remove_resource::<BoardData>();
@@ -521,12 +522,13 @@ pub fn game_over_screen(
                 ..default()
             },
             TextColor(colors::GREEN_YELLOW.into()),
-            BoxShadow {
-                color: colors::DARK_VIOLET.into(),
-                spread_radius: Val::Percent(60.),
-                blur_radius: Val::Px(30.0),
-                ..default()
-            },
+            BoxShadow::new(
+                colors::DARK_VIOLET.into(),
+                Val::Px(0.),
+                Val::Px(0.),
+                Val::Percent(60.),
+                Val::Px(30.0),
+            ),
         ));
 
         let go_back_button_style = UiButtonStyle {
@@ -628,13 +630,13 @@ pub fn lobby_room_screen(mut cmds: Commands, font: Res<FontSpaceGrotesk>) {
                     flex_direction: FlexDirection::Column,
                     ..default()
                 },
-                BoxShadow {
-                    color: colors::DODGER_BLUE.into(),
-                    spread_radius: Val::Px(1.),
-                    blur_radius: Val::Px(30.0),
-                    x_offset: Val::Percent(0.),
-                    y_offset: Val::Percent(0.),
-                },
+                BoxShadow::new(
+                    colors::DODGER_BLUE.into(),
+                    Val::Percent(0.),
+                    Val::Percent(0.),
+                    Val::Px(1.),
+                    Val::Px(30.0),
+                ),
             ))
             .with_children(|anchor| {
                 anchor.spawn((
@@ -708,13 +710,10 @@ pub fn populate_lobby_from_cache(
     mut lobby_panel_q: Query<Entity, With<LobbyPanel>>,
     connection: Res<NetworkConnection>,
     font: Res<FontSpaceGrotesk>,
-) {
-    let Ok(lobby_entity) = lobby_panel_q.get_single_mut() else {
-        warn!("GameRoom populate lobby early return!");
-        return;
-    };
+) -> bevy::prelude::Result {
+    let lobby_entity = lobby_panel_q.single_mut()?;
 
-    cmds.entity(lobby_entity).despawn_descendants();
+    cmds.entity(lobby_entity).despawn_related::<Children>();
     cmds.entity(lobby_entity).with_children(|l| {
         for (idx, (room_id, game_id)) in connection
             .db()
@@ -796,6 +795,7 @@ pub fn populate_lobby_from_cache(
             });
         }
     });
+    Ok(())
 }
 
 #[allow(clippy::type_complexity)]

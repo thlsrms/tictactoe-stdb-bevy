@@ -11,8 +11,8 @@ use crate::ui::{
 };
 
 use super::{
-    Game, GameState, LobbyRoom, NetworkAuth, NetworkConnection, NetworkEvent, OnConnect, OnDelete,
-    OnInsert, OnUpdate, Player,
+    Game, GameState, LobbyRoom, NetworkAuth, NetworkConnection, OnConnect, OnDelete, OnInsert,
+    OnUpdate, Player, Stdb,
 };
 
 pub fn setup_systems(app: &mut App) {
@@ -21,18 +21,18 @@ pub fn setup_systems(app: &mut App) {
     let update_initialization = on_network_connected.run_if(in_state(AppState::Initialization));
 
     let update_home_screen = (
-        on_lobby_room_created.run_if(on_event::<NetworkEvent<OnInsert<LobbyRoom>>>),
-        on_lobby_room_removed.run_if(on_event::<NetworkEvent<OnDelete<LobbyRoom>>>),
-        on_game_created.run_if(on_event::<NetworkEvent<OnInsert<Game>>>),
+        on_lobby_room_created.run_if(on_event::<Stdb<OnInsert<LobbyRoom>>>),
+        on_lobby_room_removed.run_if(on_event::<Stdb<OnDelete<LobbyRoom>>>),
+        on_game_created.run_if(on_event::<Stdb<OnInsert<Game>>>),
     )
         .run_if(in_state(AppState::HomeScreen));
 
-    let update_lobby_sceen = (on_game_created.run_if(on_event::<NetworkEvent<OnInsert<Game>>>),)
+    let update_lobby_sceen = (on_game_created.run_if(on_event::<Stdb<OnInsert<Game>>>),)
         .run_if(in_state(AppState::LobbyScreen));
 
     let update_game_in_progress = (
-        on_game_updated.run_if(on_event::<NetworkEvent<OnUpdate<Game>>>),
-        on_game_deleted.run_if(on_event::<NetworkEvent<OnDelete<Game>>>),
+        on_game_updated.run_if(on_event::<Stdb<OnUpdate<Game>>>),
+        on_game_deleted.run_if(on_event::<Stdb<OnDelete<Game>>>),
     )
         .run_if(in_state(AppState::GameInProgress));
 
@@ -74,25 +74,20 @@ fn poll_pending_connection(
 
 pub fn on_network_connected(
     mut cmds: Commands,
-    mut on_connected_ev: EventReader<NetworkEvent<OnConnect>>,
+    mut on_connected_ev: EventReader<Stdb<OnConnect>>,
     maybe_connection: Option<Res<NetworkConnection>>,
     mut game_state: ResMut<NextState<AppState>>,
 ) {
     let Some(connection) = maybe_connection else {
         return;
     };
-    for NetworkEvent(OnConnect(NetworkAuth {
+    for Stdb(OnConnect(NetworkAuth {
         identity,
         authorization,
     })) in on_connected_ev.read()
     {
         info!("Connection established");
         info!("Identity '{identity}'");
-
-        #[cfg(target_arch = "wasm32")]
-        gloo_console::log!("Connection established");
-        #[cfg(target_arch = "wasm32")]
-        gloo_console::log!("Identity '", format!("{identity}'"));
 
         let _ = connection.subscription_builder().subscribe(format!(
             "SELECT * FROM game WHERE x_player = '{}' OR o_player = '{}'",
@@ -135,14 +130,14 @@ pub fn on_network_connected(
 
 pub fn on_lobby_room_created(
     mut cmds: Commands,
-    mut new_lobby_room_ev: EventReader<NetworkEvent<OnInsert<LobbyRoom>>>,
+    mut new_lobby_room_ev: EventReader<Stdb<OnInsert<LobbyRoom>>>,
     mut lobby_panel_q: Query<(Entity, &mut ScrollPosition), With<LobbyPanel>>,
     lobby_rooms_q: Query<&Children, With<LobbyPanel>>,
     font: Res<FontSpaceGrotesk>,
     network_auth: Res<NetworkAuth>,
     mut game_state: ResMut<NextState<AppState>>,
 ) {
-    let Ok((lobby_entity, mut scroll_position)) = lobby_panel_q.get_single_mut() else {
+    let Ok((lobby_entity, mut scroll_position)) = lobby_panel_q.single_mut() else {
         warn!("LobbyRoom new room early return! No LobbyPanel!");
         return;
     };
@@ -241,25 +236,25 @@ pub fn on_lobby_room_created(
 
 pub fn on_lobby_room_removed(
     mut cmds: Commands,
-    mut lobby_room_del_ev: EventReader<NetworkEvent<OnDelete<LobbyRoom>>>,
+    mut lobby_room_del_ev: EventReader<Stdb<OnDelete<LobbyRoom>>>,
     lobby_rooms_q: Query<(Entity, &LobbyRoomId)>,
-) {
-    let Some(room_removed) = lobby_room_del_ev.read().next() else {
-        warn!("LobbyRoom room removed early return! NO EVENnt?");
-        return;
-    };
+) -> Result {
+    let room_removed = lobby_room_del_ev.read().next().ok_or(BevyError::from(
+        "LobbyRoom room removed early return! NO EVENnt?",
+    ))?;
 
     if let Some((id, _)) = lobby_rooms_q
         .iter()
         .find(|(_, room_id)| room_id.0 == room_removed.id)
     {
-        cmds.entity(id).despawn_recursive();
+        cmds.entity(id).despawn();
     }
+    Ok(())
 }
 
 pub fn on_game_created(
     mut cmds: Commands,
-    mut game_created_ev: EventReader<NetworkEvent<OnInsert<Game>>>,
+    mut game_created_ev: EventReader<Stdb<OnInsert<Game>>>,
     network_auth: Res<NetworkAuth>,
     mut game_state: ResMut<NextState<AppState>>,
 ) {
@@ -280,7 +275,7 @@ pub fn on_game_created(
 }
 
 pub fn on_game_deleted(
-    mut game_deleted_ev: EventReader<NetworkEvent<OnDelete<Game>>>,
+    mut game_deleted_ev: EventReader<Stdb<OnDelete<Game>>>,
     mut game_board: ResMut<BoardData>,
     mut game_state: ResMut<NextState<AppState>>,
 ) {
@@ -298,15 +293,15 @@ pub fn on_game_updated(
     mut cmds: Commands,
     mut cell_q: Query<(Entity, &mut BackgroundColor, &GridCell), Without<CellMarked>>,
     mut turn_owner_label_q: Query<(&mut Text, &mut TextColor), With<TurnOwnerLabel>>,
-    mut game_update_ev: EventReader<NetworkEvent<OnUpdate<Game>>>,
+    mut game_update_ev: EventReader<Stdb<OnUpdate<Game>>>,
     mut game_board: ResMut<BoardData>,
     mut game_state: ResMut<NextState<AppState>>,
     font: Res<FontSpaceGrotesk>,
-) {
-    let Some(NetworkEvent(OnUpdate { old, new })) = game_update_ev.read().next() else {
-        warn!("Game Updated: none early return");
-        return;
-    };
+) -> Result {
+    let Stdb(OnUpdate { old, new }) = game_update_ev
+        .read()
+        .next()
+        .ok_or(BevyError::from("StdbEvent not found"))?;
 
     if (old.turn_owner != new.turn_owner) && !new.time_expired {
         // No time_expired, we assume the old turn_owner has made a valid move to trigger the update
@@ -331,12 +326,12 @@ pub fn on_game_updated(
             }
         };
 
-        let Some((entity_id, mut color, _)) =
-            cell_q.iter_mut().find(|(_, _, c)| c.0 == cell_marked_id)
-        else {
-            warn!("CellEntity '{cell_marked_id}' modified but was not found");
-            return;
-        };
+        let (entity_id, mut color, _) = cell_q
+            .iter_mut()
+            .find(|(_, _, c)| c.0 == cell_marked_id)
+            .ok_or(BevyError::from(
+            "CellEntity '{cell_marked_id}' modified but was not found",
+        ))?;
         *color = bg_color;
         let mut e = cmds.entity(entity_id);
         e.insert(CellMarked);
@@ -356,7 +351,7 @@ pub fn on_game_updated(
             game_board.turn_duration = duration_from_turn(new.turn);
             game_board.turn_owner = new.turn_owner;
 
-            let (mut turn_owner_label, mut text_color) = turn_owner_label_q.single_mut();
+            let (mut turn_owner_label, mut text_color) = turn_owner_label_q.single_mut()?;
             *turn_owner_label = {
                 if game_board.turn_owner == game_board.network_primary {
                     *text_color = Color::WHITE.into();
@@ -380,6 +375,7 @@ pub fn on_game_updated(
             game_state.set(AppState::GameOverScreen);
         }
     }
+    Ok(())
 }
 
 fn duration_from_turn(n: u8) -> f32 {
