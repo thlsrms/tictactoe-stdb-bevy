@@ -2286,6 +2286,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "gloo-storage"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fbc8031e8c92758af912f9bc08fbbadd3c6f3cfcbf6b64cdf3d6a81f0139277a"
+dependencies = [
+ "gloo-utils",
+ "js-sys",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "gloo-utils"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4139,7 +4154,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-bindings-macro"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "heck 0.4.1",
  "humantime",
@@ -4152,7 +4167,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-client-api-messages"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "brotli",
  "bytes",
@@ -4175,7 +4190,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-data-structures"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "ahash",
  "getrandom 0.2.16",
@@ -4188,7 +4203,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-lib"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "anyhow",
  "bitflags 2.9.0",
@@ -4210,7 +4225,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-metrics"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "arrayvec",
  "itertools 0.12.1",
@@ -4221,7 +4236,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-primitives"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "bitflags 2.9.0",
  "either",
@@ -4232,7 +4247,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sats"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "anyhow",
  "arrayvec",
@@ -4260,7 +4275,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sdk"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#7da2220201a12f4dff683d3af837da5d61bec47d"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
 dependencies = [
  "anymap3",
  "base64 0.21.7",
@@ -4271,6 +4286,7 @@ dependencies = [
  "futures-util",
  "getrandom 0.3.2",
  "gloo-console",
+ "gloo-storage",
  "home",
  "http",
  "log",
@@ -4650,8 +4666,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-tungstenite-wasm"
-version = "0.5.0"
-source = "git+https://github.com/thlsrms/tokio-tungstenite-wasm?rev=c788b7cfc30f576c#c788b7cfc30f576c207344c2907932b5317ca5e0"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02567f5f341725fb3e452c1f55dd4e5b0f2a685355c3b10babf0fe8e137d176e"
 dependencies = [
  "bytes",
  "futures-channel",

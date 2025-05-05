@@ -96,25 +96,10 @@ pub fn on_network_connected(
 
         #[cfg(target_arch = "wasm32")]
         {
-            // Re-exported browser storage api wrappers
-            // use spacetimedb_sdk::credentials::{LocalStorage, SessionStorage, Storage};
             use spacetimedb_sdk::credentials::cookies::Cookie;
-            // On the web we can't connect using `with_token`, so we would have
-            // to send our authorization token through a reducer if needed.
-            let authorization = if let Ok(Some(token)) = Cookie::get("tictactoe_token") {
-                token
-            } else {
-                let _ = Cookie::new("tictactoe_token", authorization.clone()).set();
-                authorization.to_owned()
-            };
-
-            cmds.insert_resource(NetworkAuth {
-                identity: *identity,
-                authorization: authorization.to_owned(),
-            });
+            let _ = Cookie::new("tictactoe_auth", authorization.clone()).set();
         }
 
-        #[cfg(not(target_arch = "wasm32"))]
         cmds.insert_resource(NetworkAuth {
             identity: *identity,
             authorization: authorization.to_owned(),
