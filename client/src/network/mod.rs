@@ -46,7 +46,7 @@ pub fn connect_stdb(app: &mut App) {
         // Re-exported browser storage api wrappers
         // use spacetimedb_sdk::credentials::{LocalStorage, SessionStorage, Storage};
         use spacetimedb_sdk::credentials::cookies::Cookie;
-        let conn_builder = if let Ok(Some(token)) = Cookie::get("tictactoe_auth") {
+        let conn_builder = if let Ok(token) = Cookie::get("tictactoe_auth") {
             conn_builder.with_token(token)
         } else {
             conn_builder

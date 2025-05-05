@@ -23,7 +23,7 @@ bevy = { version = "0.16.0", default-features = false, features = ["wayland"] }
 [target.wasm32-unknown-unknown.dependencies]
 bevy = { version = "0.16.0", default-features = false, features = ["webgl2"] }
 bevy_ecs = "0.16.0"
-gloo-console = "0.3.0"
+spacetimedb-sdk = { git = "https://github.com/thlsrms/SpacetimeDB", branch ="rust-web-sdk", features = ["web"]}
 
 [profile.dev]
 opt-level = 1

@@ -3736,20 +3736,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 
 [[package]]
-name = "ring"
-version = "0.17.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7"
-dependencies = [
- "cc",
- "cfg-if",
- "getrandom 0.2.16",
- "libc",
- "untrusted",
- "windows-sys 0.52.0",
-]
-
-[[package]]
 name = "ron"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3815,36 +3801,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustls"
-version = "0.23.26"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df51b5869f3a441595eac5e8ff14d486ff285f7b8c0df8770e49c3b56351f0f0"
-dependencies = [
- "once_cell",
- "rustls-pki-types",
- "rustls-webpki",
- "subtle",
- "zeroize",
-]
-
-[[package]]
 name = "rustls-pki-types"
 version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "917ce264624a4b4db1c364dcc35bfca9ded014d0a958cd47ad3e960e988ea51c"
 dependencies = [
  "web-time",
-]
-
-[[package]]
-name = "rustls-webpki"
-version = "0.103.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fef8b8769aaccf73098557a87cd1816b4f9c7c16811c9c77142aa695c16f2c03"
-dependencies = [
- "ring",
- "rustls-pki-types",
- "untrusted",
 ]
 
 [[package]]
@@ -4154,7 +4116,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-bindings-macro"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "heck 0.4.1",
  "humantime",
@@ -4167,7 +4129,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-client-api-messages"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "brotli",
  "bytes",
@@ -4190,7 +4152,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-data-structures"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "ahash",
  "getrandom 0.2.16",
@@ -4203,7 +4165,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-lib"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "anyhow",
  "bitflags 2.9.0",
@@ -4225,7 +4187,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-metrics"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "arrayvec",
  "itertools 0.12.1",
@@ -4236,7 +4198,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-primitives"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "bitflags 2.9.0",
  "either",
@@ -4247,7 +4209,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sats"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "anyhow",
  "arrayvec",
@@ -4275,7 +4237,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sdk"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#b4a0872372b916343d1ec5b8ab3694ba9709f58b"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
 dependencies = [
  "anymap3",
  "base64 0.21.7",
@@ -4303,7 +4265,6 @@ dependencies = [
  "tokio",
  "tokio-tungstenite",
  "tokio-tungstenite-wasm",
- "tungstenite",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -4400,12 +4361,6 @@ dependencies = [
  "rustversion",
  "syn",
 ]
-
-[[package]]
-name = "subtle"
-version = "2.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 
 [[package]]
 name = "svg_fmt"
@@ -4535,7 +4490,6 @@ dependencies = [
  "bevy",
  "bevy_ecs",
  "crossbeam-channel",
- "gloo-console",
  "paste",
  "spacetimedb-sdk",
 ]
@@ -4818,7 +4772,6 @@ dependencies = [
  "log",
  "native-tls",
  "rand 0.9.1",
- "rustls",
  "sha1",
  "thiserror 2.0.12",
  "utf-8",
@@ -4895,12 +4848,6 @@ name = "unicode-xid"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
-
-[[package]]
-name = "untrusted"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "utf-8"
@@ -5680,9 +5627,3 @@ dependencies = [
  "quote",
  "syn",
 ]
-
-[[package]]
-name = "zeroize"
-version = "1.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
