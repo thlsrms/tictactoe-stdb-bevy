@@ -43,15 +43,6 @@ pub fn connect_stdb(app: &mut App) {
 
     #[cfg(target_arch = "wasm32")]
     {
-        // Re-exported browser storage api wrappers
-        // use spacetimedb_sdk::credentials::{LocalStorage, SessionStorage, Storage};
-        use spacetimedb_sdk::credentials::cookies::Cookie;
-        let conn_builder = if let Ok(token) = Cookie::get("tictactoe_auth") {
-            conn_builder.with_token(token)
-        } else {
-            conn_builder
-        };
-
         // The web version needs to poll the connection
         let connection_task = AsyncComputeTaskPool::get().spawn(async move {
             conn_builder

@@ -66,7 +66,7 @@ fn poll_pending_connection(
         futures_lite::future::block_on(futures_lite::future::poll_once(&mut pending.0))
     {
         super::register_callbacks(&mut cmds, &mut conn);
-        conn.run_threaded();
+        conn.run_background();
         cmds.insert_resource(NetworkConnection::new(conn));
         cmds.remove_resource::<super::PendingConnection>();
     }

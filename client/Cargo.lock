@@ -4116,7 +4116,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-bindings-macro"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "heck 0.4.1",
  "humantime",
@@ -4129,7 +4129,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-client-api-messages"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "brotli",
  "bytes",
@@ -4152,7 +4152,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-data-structures"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "ahash",
  "getrandom 0.2.16",
@@ -4165,7 +4165,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-lib"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "anyhow",
  "bitflags 2.9.0",
@@ -4187,7 +4187,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-metrics"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "arrayvec",
  "itertools 0.12.1",
@@ -4198,7 +4198,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-primitives"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "bitflags 2.9.0",
  "either",
@@ -4209,7 +4209,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sats"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "anyhow",
  "arrayvec",
@@ -4237,7 +4237,7 @@ dependencies = [
 [[package]]
 name = "spacetimedb-sdk"
 version = "1.1.1"
-source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#9ec9ff642982cbd670167dc52ae5f15b1eabaea5"
+source = "git+https://github.com/thlsrms/SpacetimeDB?branch=rust-web-sdk#d2011c895b2aee89c316159f74b8e63e871da753"
 dependencies = [
  "anymap3",
  "base64 0.21.7",
@@ -4251,6 +4251,7 @@ dependencies = [
  "gloo-storage",
  "home",
  "http",
+ "js-sys",
  "log",
  "once_cell",
  "prometheus",
